@@ -23,14 +23,6 @@ type Token struct {
 	Token string `json:"token"`
 }
 
-//TokenExtract for cek token
-type TokenExtract struct {
-	Token   string
-	Loc     byte
-	Type    []string
-	Payload []string
-}
-
 const (
 	secretKey = "WOW,MuchShibe,ToDogge" //SecretKey
 )
@@ -92,7 +84,7 @@ func GenerateToken(user Credential, secretKey []byte) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	// Set some claims
 	claims := make(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 	claims["username"] = user.Username
 	claims["password"] = user.Password
 	token.Claims = claims
