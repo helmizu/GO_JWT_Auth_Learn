@@ -10,6 +10,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/bcrypt"
 )
 
 //Credential to generate token
@@ -105,4 +106,16 @@ func CekToken(myToken string, myKey string) bool {
 		fmt.Println("This token is terrible!  I cannot accept this.")
 		return false
 	}
+}
+
+//HashPassword for hashing password
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+//CheckPasswordHash to cek if login
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }
