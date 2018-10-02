@@ -43,6 +43,7 @@ func main() {
 
 	r := mux.NewRouter()
 
+	r.HandleFunc("/signup", signup).Methods("POST")
 	r.HandleFunc("/login", createToken).Methods("POST")
 	r.HandleFunc("/cek", cekToken).Methods("GET")
 
@@ -118,4 +119,13 @@ func HashPassword(password string) (string, error) {
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
+}
+
+func signup(w http.ResponseWriter, r *http.Request) {
+	var user Credential
+	json.NewDecoder(r.Body).Decode(&user)
+	hash, err := HashPassword(user.Password)
+	if err == nil {
+		fmt.Println(hash)
+	}
 }
