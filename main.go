@@ -15,13 +15,18 @@ import (
 
 //Credential to generate token
 type Credential struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 // Token for respond
 type Token struct {
 	Token string `json:"token"`
+}
+
+//Message for respond
+type Message struct {
+	Message string `json:"msg"`
 }
 
 const (
@@ -51,7 +56,7 @@ func main() {
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Accept", "Authorization"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "OPTIONS"})
 
-	if err := http.ListenAndServe(":3000", handlers.CORS(originsOk, headersOk, methodsOk)(r)); err != nil {
+	if err := http.ListenAndServe(":7000", handlers.CORS(originsOk, headersOk, methodsOk)(r)); err != nil {
 		log.Fatal(err)
 	}
 
@@ -74,7 +79,10 @@ func createToken(w http.ResponseWriter, r *http.Request) {
 func cekToken(w http.ResponseWriter, r *http.Request) {
 	tokenString := r.Header.Get("Authorization")
 	if CekToken(tokenString, secretKey) {
-		w.WriteHeader(http.StatusOK)
+		msg := &Message{
+			Message: "Your token is valid.  I like your style.",
+		}
+		respondWithJSON(w, http.StatusOK, msg)
 	} else {
 		respondWithError(w, http.StatusUnauthorized, "User Unauthorized")
 	}
@@ -87,7 +95,7 @@ func GenerateToken(user Credential, secretKey []byte) (string, error) {
 	// Set some claims
 	claims := make(jwt.MapClaims)
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
-	claims["username"] = user.Username
+	claims["email"] = user.Email
 	claims["password"] = user.Password
 	token.Claims = claims
 	// Sign and get the complete encoded token as a string
